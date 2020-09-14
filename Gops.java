@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import java.util.stream.Collectors;
+import java.util.Collections;
 import java.util.stream.IntStream;
 
 /**
@@ -39,12 +39,7 @@ import java.util.stream.IntStream;
  * </p>
  */
 public class Gops {
-    GopsState initState(final int[] suit, final int players) {
-        final ArrayList<Integer> suitList = new ArrayList<Integer>(suit.length);
-        for (int s : suit) {
-            suitList.add(s);
-        }
-
+    GopsState initState(final ArrayList<Integer> suitList, final int players) {
         GopsState state = new GopsState();
         state.roundNumber = 0;
         state.remainingPrizes = (ArrayList<Integer>) suitList.clone();
@@ -101,15 +96,20 @@ public class Gops {
         return newState;
     }
 
-    public void play(int[] suit, int numPlayers) {
-        GopsState state = initState(suit, numPlayers);
-        state.report();
-        while (state.remainingPrizes.size() > 0) {
+    public void playRound( GopsState state) {
+        if (state.remainingPrizes.size() <= 0) {
+            System.out.printf("\n>>> Player %d wins!",
+                    state.cumulScore.get(0) > state.cumulScore.get(1) ? 0 : 1);
+        } else {
             state = next(state);
             state.report();
+            playRound(state);
         }
-        System.out.printf("\n>>> Player %d wins!",
-                state.cumulScore.get(0) > state.cumulScore.get(1) ? 0 : 1);
+    }
+
+    public void play(ArrayList<Integer> suit, int numPlayers) {
+        GopsState state = initState(suit, numPlayers);
+        playRound(state);
     }
 
     /**
@@ -133,7 +133,7 @@ public class Gops {
         public ArrayList<ArrayList<Integer>> remainingHands = new ArrayList<>();
 
         public void report() {
-            System.out.format("{ round: %d: bounty: %d, bids: %s -> scored: %s, cumul: %s, " +
+            System.out.format("{ round: %d: prize: %d, bids: %s -> scored: %s, cumul: %s, " +
                             "remainingHands: %s }\n",
                     roundNumber,
                     prize,
@@ -145,7 +145,8 @@ public class Gops {
     }
 
     public static void main(String[] args) {
-        int[] suite = IntStream.range(0, 12).toArray(); // to shuffle
+        ArrayList<Integer> suite = IntStream.range(0, 12).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+        Collections.shuffle(suite);
         new Gops().play(suite, 2);
     }
 }

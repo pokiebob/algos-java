@@ -1,13 +1,19 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-public class Program
+public class ArrayStudy
 {
     static Integer inPlaceRemove( ArrayList<Integer> arr, int idx) {
         return arr.remove(idx);
     }
-    
+
+    static ArrayList<Integer> range(int min, int max) {
+        ArrayList<Integer> suite = IntStream.range(0, 12).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+        return suite;
+    }
+
     static void inPlaceMult(int[] arr, int x) {
         for (int i = 0; i < arr.length; i++) {
             arr[i] *= x;
